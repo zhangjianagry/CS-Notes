@@ -89,36 +89,32 @@ The longest consecutive elements sequence is [1, 2, 3, 4]. Return its length: 4.
 要求以 O(N) 的时间复杂度求解。
 
 ```java
-public int longestConsecutive(int[] nums) {
-    Map<Integer, Integer> countForNum = new HashMap<>();
-    for (int num : nums) {
-        countForNum.put(num, 1);
+public int longestConsecutive(int[] num) {
+    int res = 0;
+    HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+    for (int n : num) {
+        if (!map.containsKey(n)) {
+            int left = (map.containsKey(n - 1)) ? map.get(n - 1) : 0;
+            int right = (map.containsKey(n + 1)) ? map.get(n + 1) : 0;
+            // sum: length of the sequence n is in
+            int sum = left + right + 1;
+            map.put(n, sum);
+            
+            // keep track of the max length 
+            res = Math.max(res, sum);
+            
+            // extend the length to the boundary(s)
+            // of the sequence
+            // will do nothing if n has no neighbors
+            map.put(n - left, sum);
+            map.put(n + right, sum);
+        }
+        else {
+            // duplicates
+            continue;
+        }
     }
-    for (int num : nums) {
-        forward(countForNum, num);
-    }
-    return maxCount(countForNum);
-}
-
-private int forward(Map<Integer, Integer> countForNum, int num) {
-    if (!countForNum.containsKey(num)) {
-        return 0;
-    }
-    int cnt = countForNum.get(num);
-    if (cnt > 1) {
-        return cnt;
-    }
-    cnt = forward(countForNum, num + 1) + 1;
-    countForNum.put(num, cnt);
-    return cnt;
-}
-
-private int maxCount(Map<Integer, Integer> countForNum) {
-    int max = 0;
-    for (int num : countForNum.keySet()) {
-        max = Math.max(max, countForNum.get(num));
-    }
-    return max;
+    return res;
 }
 ```
 
